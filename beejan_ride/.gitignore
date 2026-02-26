@@ -1,0 +1,23 @@
+# dbt Core Artifacts
+target/
+dbt_packages/
+logs/
+manifest.json
+run_results.json
+sources.json
+catalog.json
+key.json
+
+
+# Python Virtual Environments
+venv/
+.env/
+.venv/
+env/
+pip-wheel-metadata/
+
+# Cloud Credentials (GCP)
+.gcloud/
+.dbt/profiles.yml
+
+
