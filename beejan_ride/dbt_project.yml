@@ -31,6 +31,14 @@ clean-targets:         # directories to be removed by `dbt clean`
 # files using the `{{ config(...) }}` macro.
 models:
   beejan_ride:
-    # Config indicated by + and applies to all files under models/example/
-    example:
-      +materialized: view
+    # Config indicated by + and applies to all files under models/staging/
+    beejan_staging:
+      +materialized: table
+    intermediate_layer:
+      +materialized: table
+    beejan_marts:
+      +materialized: table
+
+    
+  
+      

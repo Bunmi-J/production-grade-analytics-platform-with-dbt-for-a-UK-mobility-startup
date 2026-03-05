@@ -1,0 +1,183 @@
+version: 2
+
+models:
+
+  - name: stg_cities_raw
+    description: "Cleaned and standardized city dimension used across the platform."
+
+    columns:
+      - name: city_id
+        description: "The unique identifier for each city"
+        tests:
+          - unique
+          - not_null
+      - name: launch_date
+        description: "The date when the city was launched on the platform"
+        tests:
+          - not_null
+
+
+  - name: stg_driver_status_events_raw
+    columns:
+      - name: event_id
+        description: "The unique identifier for each driver status event"
+        tests:
+          - unique
+          - not_null
+      - name: driver_id
+        description: "The unique identifier for each driver"
+        tests:
+          - not_null
+      - name: status
+        description: "The status of the driver (e.g., online, offline)"
+        tests:
+          - accepted_values:
+              values: ['online', 'offline']
+  - name: stg_drivers_raw
+    columns:
+      - name: driver_id
+        description: "The unique identifier for each driver"
+        tests:
+          - unique
+          - not_null
+
+      - name: city_id
+        description: "The unique identifier for the city where the driver operates"
+        tests:
+          - not_null
+         
+      - name: vehicle_id
+        description: "The unique identifier for the driver's vehicle"
+        tests:
+          - not_null
+          
+      - name: driver_status
+        description: "The current status of the driver (e.g., active, inactive)"
+        tests:
+          - accepted_values:
+              values: ['active', 'inactive', 'suspended']
+            
+  - name: stg_payments_raw
+    columns:
+      - name: payment_id
+        description: "The unique identifier for each payment"
+        tests:
+          - unique
+          - not_null
+      - name: trip_id
+        description: "The unique identifier for the trip associated with the payment"
+        tests:
+          - not_null
+      - name: payment_provider
+        description: "The provider of the payment platform (e.g., Stripe, PayPal)"
+        tests:
+          - accepted_values:
+              values: ['stripe', 'paypal']
+      - name: amount
+        description: "The amount of the payment"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: " >0" 
+      - name: payment_status
+        description: "The status of the payment (e.g., success, pending, failed)"
+        tests:
+          - accepted_values:
+              values: ['success', 'failed']
+      - name: fee
+        description: "The fees associated with the payment"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: '>= 0'
+                  
+  - name: stg_riders_raw
+    columns:
+      - name: rider_id
+        description: "The unique identifier for each rider"
+        tests:
+          - unique
+          - not_null
+      
+      - name: signup_date
+        description: "The date when the rider registered on the platform"
+        tests:
+          - not_null
+
+         
+  - name: stg_trips_raw
+    description: "Cleaned, deduplicated, and data type‑standardised trips fact table used across analytics and downstream marts"
+    columns:
+      - name: trip_id
+        description: "The unique identifier for each trip"
+        tests:
+          - unique
+          - not_null
+      - name: rider_id
+        description: "The unique identifier for the rider associated with the trip"
+        tests:
+          - not_null
+      - name: driver_id
+        description: "The unique identifier for the driver associated with the trip"
+        tests:
+          - not_null
+      - name: city_id
+        description: "The unique identifier for the city where the trip took place"
+        tests:
+          - not_null
+      - name: status 
+        description: "The status of the trip (e.g., completed, cancelled)"
+        tests:
+          - accepted_values:
+              values: ['completed', 'cancelled', 'no_show']
+      - name: payment_method
+        description: "The method of payment used for the trip (e.g., card, cash)"
+        tests:
+          - accepted_values:
+              values: ['card', 'cash', 'wallet']
+      - name: is_corporate
+        description: "Indicates whether the trip was a corporate trip"
+        tests:
+          - not_null
+  
+      - name: pickup_at
+        description: "The timestamp when the driver picked up the rider"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: '>= requested_at'
+          - dbt_utils.expression_is_true:
+              expression: '<= dropoff_at'
+      - name: dropoff_at
+        description: "The timestamp when the driver dropped off the rider"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: '>= pickup_at'
+      - name: requested_at
+        description: "The timestamp when the rider requested the trip"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ' <= pickup_at'
+      - name: created_at
+        description: "Timestamp when the trip record was created."
+        tests:
+          - not_null
+
+      - name: updated_at
+        description: "The timestamp when the trip record was last updated"
+        tests:
+          - not_null
+        
+      - name: actual_fare
+        description: "The actual fare charged for the trip"
+        tests:
+          - not_null
+          
+      - name: estimated_fare
+        description: "The estimated fare for the trip at the time of request"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: '>0'

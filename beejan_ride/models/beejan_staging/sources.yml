@@ -1,0 +1,210 @@
+version: 2
+
+sources:
+  - name: beejan_dataset
+    description: "This is the source data for the beejan ride project"
+    database: beejanride-488423
+    schema: beejan_dataset
+    freshness:
+        warn_after: {count: 12, period: hour}
+        error_after: {count: 24, period: hour} 
+  
+    tables:
+      - name: cities_raw
+        description: "This table contains the city information for the beejan ride project"
+        columns:
+          - name: city_id
+            description: "Primary key for the city"
+            tests:
+              - not_null
+              - unique
+
+          - name: country
+            description: "Country where the city is located"
+            tests:
+              - not_null
+
+          - name: city_name
+            description: "Name of the city"
+            tests:
+              - not_null
+
+          - name: launch_date
+            description: "Date when the city was launched on the platform"
+            tests:
+              - not_null
+
+      - name: driver_status_events_raw
+        description: "This table contains the driver status events changes for the beejan ride project"
+        columns:
+          - name: event_id
+            description: "Primary key for the driver status event"
+            tests:
+              - not_null
+              - unique
+
+          - name: driver_id
+            description: "Driver associated with the status event"
+            tests:
+              - not_null
+
+          - name: status
+            description: "Driver status at the time of the event"
+            tests:
+              - accepted_values:
+                  values: ['online', 'offline']
+
+          - name: event_timestamp
+            description: "Timestamp when the status event occurred"
+            tests:
+              - not_null
+
+      - name: drivers_raw
+        description: "This table contains the raw driver information for the beejan ride project"
+        columns:
+          - name: driver_id
+            description: "Primary key for the driver"
+            tests:
+              - not_null
+              - unique
+
+          - name: city_id
+            description: "City where the driver operates"
+            tests:
+              - not_null
+
+          - name: vehicle_id
+            description: "Vehicle assigned to the driver"
+            tests:
+              - not_null
+              - unique
+
+          - name: driver_status
+            description: "Driver's current operational status"
+            tests:
+              - accepted_values:
+                  values: ['active', 'inactive', 'suspended']
+
+          - name: rating
+            description: "Driver's average rating"
+
+      - name: payments_raw
+        description: "This table contains the raw payment information for the beejan ride project"
+        columns:
+          - name: payment_id
+            description: "Primary key for the payment"
+            tests:
+              - not_null
+              - unique
+
+          - name: trip_id
+            description: "Trip associated with the payment"
+            tests:
+              - not_null
+
+          - name: amount
+            description: "Payment amount"
+            tests:
+              - not_null
+
+          - name: payment_status
+            description: "Status of the payment"
+            tests:
+              - accepted_values:
+                  values: ['success', 'failed']
+
+          - name: payment_provider
+            description: "Payment platform used"
+            tests:
+              - accepted_values:
+                  values: ['stripe', 'paypal']
+
+          - name: fee
+            description: "Processing fee applied to the payment"
+
+
+      - name: riders_raw
+        description: "This table contains the raw rider information for the beejan ride project"
+        columns:
+          - name: rider_id
+            description: "Primary key for the rider"
+            tests:
+              - not_null
+              - unique
+
+          - name: country
+            description: "Country where the rider is registered"
+            tests:
+              - not_null
+         
+          - name: created_at
+            description: "Timestamp when the rider record was created in the system"
+            tests:
+              - not_null
+
+          - name: signup_date
+            description: "Date the rider registered on the platform"
+            tests:
+              - not_null
+
+          - name: referral_code
+            description: "Referral code used during signup, if any"
+
+      - name: trips_raw
+        description: "This table contains the rawtrip information for the beejan ride project"
+        columns:
+          - name: trip_id
+            description: "Primary key for the trip"
+            tests:
+              - not_null
+              - unique
+
+          - name: rider_id
+            description: "Rider associated with the trip"
+            tests:
+              - not_null
+
+          - name: driver_id
+            description: "Driver assigned to the trip"
+            tests:
+              - not_null
+
+          - name: city_id
+            description: "City where the trip occurred"
+
+          - name: status
+            description: "Trip lifecycle status (requested, accepted, completed, cancelled)"
+
+          - name: requested_at
+            description: "Timestamp when the rider requested the trip"
+            tests:
+              - not_null
+          - name: pickup_at
+            description: "Timestamp when the driver picked up the rider"
+
+          - name: dropoff_at
+            description: "Timestamp when the rider was dropped off"
+         
+          - name: created_at
+            description: "Timestamp when the trip record was created in the system"
+          
+          - name: updated_at
+            description: "The timestamp when the trip record was last updated"
+        
+          - name: actual_fare
+            description: "Final fare charged to the rider"
+
+          - name: estimated_fare
+            description: "Estimated fare shown before the trip"
+
+          - name: surge_multiplier
+            description: "Surge pricing multiplier applied to the fare"
+
+          - name: payment_method
+            description: "Payment method used for the trip"
+
+          - name: is_corporate
+            description: "Whether the trip was billed to a corporate account"
+
+
+
