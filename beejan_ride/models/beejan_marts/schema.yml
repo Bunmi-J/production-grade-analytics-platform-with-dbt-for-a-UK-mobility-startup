@@ -1,0 +1,295 @@
+version: 2
+
+models:
+
+  # This schema contains clear descriptions, tests for PKs, FKs, accepted values, and relationships for the
+  # dimensions and fact tables in the Beejan Rides data mart. It is designed to ensure data quality and clean 
+  #data modeling practices, while also providing comprehensive documentation for each model and column. The schema is structured to support robust analytics
+  # and reporting on the Beejan Rides platform.
+  
+  # DIMENSIONS
+  
+  - name: dim_cities
+    description: "Dimension table containing city-level attributes for trips and drivers."
+    columns:
+      - name: city_id
+        description: "Primary key for the city dimension."
+        tests:
+          - unique
+          - not_null
+      - name: city_name
+        description: "Name of the city."
+      - name: country
+        description: "Country where the city is located."
+      - name: launch_date
+        description: "The date when Beejan Rides launched in the city."
+      
+
+  - name: dim_riders
+    description: "Dimension table containing rider attributes."
+    columns:
+      - name: rider_id
+        description: "Primary key for the rider dimension."
+        tests:
+          - unique
+          - not_null
+      - name: country
+        description: "Country where the rider is located."
+      - name: signup_date
+        description: "Date the rider signed up."
+      - name: referral_code
+        description: "Referral code used by the rider."
+      - name: created_at
+        description: "Timestamp when the rider record was created."
+      
+
+  - name: dim_drivers
+    description: "Dimension table containing driver attributes."
+    columns:
+      - name: driver_id
+        description: "Primary key for the driver dimension."
+        tests:
+          - unique
+          - not_null
+      - name: city_id
+        description: "Foreign key to dim_city indicating the city where the driver operates."
+        tests:
+          - relationships:
+              to: ref('dim_city')
+              field: city_id
+      - name: created_at
+        description: "Timestamp when the driver record was created."
+      - name: update_at
+        description: "Timestamp when the driver record was last updated."
+      - name: vehicle_id
+        description: "ID of the vehicle the driver uses."
+      - name: rating
+        description: "rating of the driver."
+      - name: driver_status
+        description: "Status of the driver (active, inactive, suspended)."
+        tests:
+             - accepted_values:
+                  values: ['active', 'inactive', 'suspended']
+      - name: onboarding_date
+        description: "Date when the driver completed onboarding."
+
+  - name: dim_payments
+    description: "Dimension table containing payment method categories."
+    columns:
+      - name: payment_id
+        description: "Primary key for the payment method dimension."
+        tests:
+          - unique
+          - not_null
+      - name: payment_provider
+        description: "Name of the payment provider (e.g., Stripe, PayPal)."
+        tests:
+          - accepted_values:
+              values: ['stripe', 'paypal']
+      - name: amount
+        description: "Amount paid for the trip."
+      - name: fee
+        description: "Fee associated with the payment."
+      - name: currency
+        description: "Currency of the payment."
+      - name: payment_status
+        description: "Status of the payment (successful, failed, pending)."  
+        tests:
+          - accepted_values:
+              values: ['successful', 'failed']
+
+  - name: dim_date
+    description: "Date dimension table used for time-based analysis."
+    columns:
+      - name: date_id
+        description: "Primary key for the date dimension."
+        tests:
+          - unique
+          - not_null
+      - name: date
+        description: "Calendar date."
+      - name: day
+        description: "Day of the month."
+      - name: week
+        description: "Week number of the year."
+      - name: month
+        description: "Month number."
+      - name: quarter
+        description: "Quarter of the year."
+      - name: year
+        description: "Year."
+      - name: is_weekend
+        description: "Boolean flag indicating if the date is a weekend."
+
+  
+  # FACT TABLES
+ 
+  - name: fact_trips
+    description: "Central fact table containing trip-level metrics enriched by intermediate models."
+    columns:
+      - name: trip_id
+        description: "Primary key for the trip fact table."
+        tests:
+          - unique
+          - not_null
+      - name: rider_id
+        description: "Foreign key to dim_rider."
+        tests:
+          - relationships:
+              to: ref('dim_riders')
+              field: rider_id
+      - name: driver_id
+        description: "Foreign key to dim_driver."
+        tests:
+          - relationships:
+              to: ref('dim_drivers')
+              field: driver_id
+      - name: city_id
+        description: "Foreign key to dim_city."
+        tests:
+          - relationships:
+              to: ref('dim_cities')
+              field: city_id
+      - name: pickup_at
+        description: "Timestamp when the trip started."
+      - name: dropoff_at
+        description: "Timestamp when the trip ended."
+      - name: trip_duration_minutes
+        description: "Duration of the trip in minutes."
+      - name: wait_time_minutes
+        description: "Wait time for the trip in minutes."
+      - name: surge_multiplier
+        description: "Surge pricing multiplier applied to the trip."
+      - name: net_revenue_calc
+        description: "Net revenue generated from the trip."
+      - name: failed_payment_on_completed_trip_flag
+        description: "Flag indicating if the trip had a failed payment."
+      - name: duplicate_payment_flag
+        description: "Flag indicating if duplicate payments were detected."
+      - name: high_surge_flag
+        description: "Flag indicating high surge pricing."
+      - name: extreme_surge_flag
+      - name: suspicious_short_trip_flag
+        description: "Flag indicating a suspiciously short trip."
+      - name: suspicious_long_trip_flag
+        description: "Flag indicating a suspiciously long trip."
+      - name: zero_fare_flag
+        description: "Flag indicating a trip with a zero fare."
+      - name: missing_timestamps_flag
+        description: "Flag indicating missing pickup or dropoff timestamps."
+      - name: driver_lifetime_trips
+        description: "Total number of trips completed by the driver up to the time of the trip."
+      - name: created_at
+        description: "Timestamp when the trip record was created."
+      - name: updated_at
+        description: "Timestamp when the trip record was last updated."
+      - name: requested_at
+        description: "Timestamp when the trip was requested."  
+      - name: corporate_trip_flag
+        description: "Flag indicating if the trip was billed to a corporate account."
+      - name: is_completed
+        description: "Flag indicating if the trip was completed."
+      - name: is_cancelled
+        description: "Flag indicating if the trip was cancelled."
+        
+    
+        
+  - name: fact_payments
+    description: "Fact table containing payment-level transactions."
+    columns:
+      - name: payment_id
+        description: "Primary key for the payment fact table."
+        tests:
+          - unique
+          - not_null
+      - name: trip_id
+        description: "Foreign key to fact_trips."
+        tests:
+          - relationships:
+              to: ref('fact_trips')
+              field: trip_id
+      - name: rider_id
+        description: "Foreign key to dim_rider."
+        tests:
+          - relationships:
+              to: ref('dim_riders')
+              field: rider_id
+      - name: driver_id
+        description: "Foreign key to dim_driver."
+        tests:
+          - relationships:
+              to: ref('dim_drivers')
+              field: driver_id
+      #- name: payment_method_id
+      # description: "Foreign key to dim_payment_method."
+      #  tests:
+      #   - relationships:
+      #        to: ref('dim_payment_method')
+      #       field: payment_method_id
+      - name: amount
+        description: "Amount paid for the trip."
+      - name: payment_status
+        description: "Status of the payment (successful, failed, pending)."
+      - name: created_at
+        description: "Timestamp when the payment was made."
+      - name: failed_payment_on_completed_trip_flag
+        description: "Flag indicating if the payment failed."
+      - name: duplicate_payment_flag
+        description: "Flag indicating if the payment was duplicated."
+
+  - name: fact_driver_status_events
+    description: "Fact table containing driver status change events."
+    columns:
+      - name: event_id
+        description: "Primary key for the driver status event fact table."
+        tests:
+          - unique
+          - not_null
+      - name: driver_id
+        description: "Foreign key to dim_driver."
+        tests:
+          - relationships:
+              to: ref('dim_drivers')
+              field: driver_id
+      - name: status
+        description: "Driver status at the time of the event."
+      - name: event_timestamp
+        description: "Timestamp when the status event occurred."
+
+  # ============================
+  # OPTIONAL SNAPSHOT FACTS
+  # ============================
+
+  # name: fact_riders
+    #description: "Snapshot fact table containing rider lifetime metrics."
+    #columns:
+     # - name: rider_id
+      #  description: "Primary key for the rider snapshot fact."
+       # tests:
+        #  - unique
+         # - not_null
+      #- name: lifetime_value
+       # description: "Total lifetime value of the rider."
+      #- name: total_trips
+       # description: "Total number of trips taken by the rider."
+      #- name: first_trip_date
+       # description: "Date of the rider's first trip."
+      #- name: last_trip_date
+       # description: "Date of the rider's most recent trip."
+
+  #- name: fact_drivers
+    #description: "Snapshot fact table containing driver lifetime metrics."
+    #columns:
+      #- name: driver_id
+        #description: "Primary key for the driver snapshot fact."
+        #tests:
+      #    - unique
+       #   - not_null
+    #  - name: lifetime_trips
+     #   description: "Total number of trips completed by the driver."
+   #   - name: total_earnings
+  #      description: "Total earnings accumulated by the driver."
+   #   - name: first_trip_date
+  #    description: "Date of the driver's first trip."
+  #  - name: last_trip_date
+    #  description: "Date of the driver's most recent trip." #

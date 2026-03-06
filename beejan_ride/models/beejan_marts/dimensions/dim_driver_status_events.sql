@@ -1,7 +1,7 @@
 with driver_status as (
 
     select *
-    from {{ ref('stg_driver_status_eventsraw') }}
+    from {{ ref('stg_driver_status_events_raw') }}
 
 )
 

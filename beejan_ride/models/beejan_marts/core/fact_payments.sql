@@ -1,4 +1,6 @@
---
+-- This model creates the fact_payments table which contains payment information for each trip, 
+-- along with flags for failed payments, extreme surge pricing, and duplicate payments. It 
+-- joins the raw payments data with the intermediate tables that flag failed payments and duplicates.
 
 with payments as (
     select * from {{ ref('stg_payments_raw') }}
@@ -16,16 +18,17 @@ final as (
     select
         p.payment_id,
         p.trip_id,
-        p.rider_id,
-        p.driver_id,
-        p.payment_amount,
+        f.rider_id,
+        f.driver_id,
+        p.amount,
+        p.fee,
         p.payment_status,
-        p.payment_method as payment_method_id,
-        p.payment_timestamp,
-        f.failed_payment_flag,
+       -- p.payment_method as payment_method_id,
+        f.failed_payment_on_completed_trip_flag,
+        f.extreme_surge_flag,
         d.duplicate_payment_flag,
-        p.created_at,
-        p.updated_at
+        p.created_at
+        
     from payments p
     left join failed f on p.trip_id = f.trip_id
     left join duplicates d on p.trip_id = d.trip_id

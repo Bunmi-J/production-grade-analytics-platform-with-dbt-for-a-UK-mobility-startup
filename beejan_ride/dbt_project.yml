@@ -39,6 +39,7 @@ models:
     beejan_marts:
       +materialized: table
 
-    
+    beejan_marts:
+      +materialized: table
   
       
