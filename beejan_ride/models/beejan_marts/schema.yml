@@ -96,7 +96,7 @@ models:
         description: "Status of the payment (successful, failed, pending)."  
         tests:
           - accepted_values:
-              values: ['successful', 'failed']
+              values: ['success', 'failed']
 
   - name: dim_date
     description: "Date dimension table used for time-based analysis."
@@ -124,7 +124,7 @@ models:
   
   # FACT TABLES
  
-  - name: fact_trips
+  - name: fact_trips.sql
     description: "Central fact table containing trip-level metrics enriched by intermediate models."
     columns:
       - name: trip_id
@@ -156,12 +156,27 @@ models:
         description: "Timestamp when the trip ended."
       - name: trip_duration_minutes
         description: "Duration of the trip in minutes."
+        tests:
+          - not_null
+          - trip_duration_positive
+
       - name: wait_time_minutes
         description: "Wait time for the trip in minutes."
+      - name: status
+        description: "Status of the trip (completed, cancelled, no-show)."
+        tests:
+          - accepted_values:
+              values: ['completed', 'cancelled', 'no_show']
+          - completed_trip_has_successful_payment
+
       - name: surge_multiplier
         description: "Surge pricing multiplier applied to the trip."
       - name: net_revenue_calc
         description: "Net revenue generated from the trip."
+        tests:
+          - not_null
+          - no_negative_revenue
+
       - name: failed_payment_on_completed_trip_flag
         description: "Flag indicating if the trip had a failed payment."
       - name: duplicate_payment_flag
@@ -194,7 +209,7 @@ models:
         
     
         
-  - name: fact_payments
+  - name: fact_payments.sql
     description: "Fact table containing payment-level transactions."
     columns:
       - name: payment_id
@@ -229,7 +244,7 @@ models:
       - name: amount
         description: "Amount paid for the trip."
       - name: payment_status
-        description: "Status of the payment (successful, failed, pending)."
+        description: "Status of the payment (success, failed)."
       - name: created_at
         description: "Timestamp when the payment was made."
       - name: failed_payment_on_completed_trip_flag

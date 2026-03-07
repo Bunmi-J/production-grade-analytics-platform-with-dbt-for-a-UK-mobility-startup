@@ -3,6 +3,22 @@
 -- duplicates, and fraud indicators. It joins the raw trips data with intermediate tables that
 -- calculate these metrics and flags.
 
+{{ 
+    config(
+        materialized='incremental',
+        unique_key='trip_id',
+        incremental_strategy='merge',
+        tags=['operations', 'finance', 'fraud'],
+        meta={
+        'owner': 'beejan-operations-team',
+        'team': 'beejan-finance-fraud-team',
+        'email': 'bj2026@gmail.com'
+    }
+
+    ) 
+}}
+
+
 with trips as (
     select * from {{ ref('stg_trips_raw') }}
 ),
@@ -78,3 +94,7 @@ final as (
 )
 
 select * from final
+
+{% if is_incremental() %}
+where updated_at > (select max(updated_at) from {{ this }})
+{% endif %}

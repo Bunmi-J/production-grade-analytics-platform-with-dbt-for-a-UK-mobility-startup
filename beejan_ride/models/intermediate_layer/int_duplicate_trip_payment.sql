@@ -19,7 +19,7 @@ duplicate_flagged as (
         trip_id,
         payment_count,
         successful_payments,
-        payment_ids,
+        payment_id,
         case when successful_payments > 1 then 1 else 0 end as duplicate_payment_flag
     from duplicates
 )

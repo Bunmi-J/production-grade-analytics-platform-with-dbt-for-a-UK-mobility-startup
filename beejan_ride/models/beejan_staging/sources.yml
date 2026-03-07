@@ -5,9 +5,13 @@ sources:
     description: "This is the source data for the beejan ride project"
     database: beejanride-488423
     schema: beejan_dataset
-    freshness:
+    config:
+      # This config applies to all tables in this source
+      # You can override it for individual tables if needed
+      freshness:
         warn_after: {count: 12, period: hour}
-        error_after: {count: 24, period: hour} 
+        error_after: {count: 24, period: hour}
+    
   
     tables:
       - name: cities_raw
@@ -151,7 +155,11 @@ sources:
             description: "Referral code used during signup, if any"
 
       - name: trips_raw
-        description: "This table contains the rawtrip information for the beejan ride project"
+        description: " This table checks freshness of the trips data and contains the raw trip information for the beejan ride project"
+        config:
+          freshness:
+            warn_after: {count: 2, period: hour}
+            error_after: {count: 3, period: hour}
         columns:
           - name: trip_id
             description: "Primary key for the trip"

@@ -1,3 +1,12 @@
+{{ config(
+    materialized='table',
+    tags=['operations'],
+    meta={
+        'owner': 'beejan-operations-team',
+        'email': 'bj2026@gmail.com'
+    }
+
+) }}
 with drivers as (
 
     select *
