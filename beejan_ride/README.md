@@ -21,14 +21,16 @@ The real world transactional data for BeejanRide sits in a Postgres Database, to
 
 
 ## BeejanRide End to End Data Flow
-### Source system (Postgres database) -
+### Source system (Postgres Transactional database)
 The real world transactional data that powers the BeejanRide originate and sit on this Platform. The data is raw, unprocessed and does not support analytics.The source system platform supports:
+
   * Trip services
   * Payment services
   * Driver services
   * Riders services
   * City services
   * Driver status services
+    
 ### The Raw Layer (Bigquery)
 The raw data from the source system is ingested into  Bigquery, leveraging BigQuery compute power for big data, to preserve source of truth and allow reprocessing. Using Airbyte for the ingestion, the configuration on Airbyte is set to align Progres database source schema to raw layer schema and append- dedupe. The append dedupe limits the amount of data that needs to be ingested during each ingestion run, therefore improving runtime warehouse performance.
 
@@ -77,6 +79,8 @@ Testing is to ascertain that the tranformed data adheres to business rules, logi
        * Trip duration > 0
        * Completed trip must have successful payment
   * Freshness Test - This can be configured in the source.yml file to check the freshness of the data.
+  * Snapshot - Type 2 SCD has been implemented to the drivers model to track driver_status changes, vehicle changes and rating updates. Type 2 SCD keeps both the old and new data, enhancing the ability to track historical changes like how many times a driver has changed his vehicle, whether rating has improved or poor.
+    
 ### Documentation and Governance
 To ensure smooth operations and maintainability, the models are tagged for operational efficiency
 - Tags (finance, operations, fraud)
@@ -86,31 +90,21 @@ To ensure smooth operations and maintainability, the models are tagged for opera
 - Lineage graph - Shows the model dependencies
 
     
-### Design Decison - Source → Raw → Staging → Intermediate → Mart → →
+### Design Decison - Source → Raw → Staging → Intermediate → Mart 
+The decison to use layered modelling approach is to have clean, scalable, modular,flexible and trustwortthy data in the datawarehouse that suports downstream analytics.
+  * The  raw layer is the source of truth and must not be altered. It is easier to reprocess from the raw layer if logic changes. Without this layer, source data will be transformed directly leaving us with no true source and this can be risky, leading to inaccurate, inconsistent and poor data quality. 
+ * The staging layer is where the raw data is cleaned ,standardized , deduplicated and source freshness is tested. The intermediate and mart layer depend on this layer to have a consistent data for the downstream analytics.
+ * The intermediate layer is where the business logics reside and governed. The logics are represented in modular form and staging model/intermediate  model are joined to define business logicsto en
+ * The mart layer presents the models needed for downstream analytics in form of fact tables and dimension.
+The layered approach supports collaboration, easy debugging, reuseable logics, data ownership and ability to scale easily by adding new fact and dimension tables. 
 
 ### Trade-off
-  * Append -dedupe- this setting ensures only updates are merged/ingested into the 
- datawarehouse  by using the primary key to deduplicate duplicates data.
+  * Append -dedupe- this setting ensures only updates are merged/ingested into the datawarehouse  by using the primary key to deduplicate duplicates data.
  * Incremental materialization - The implementation of incremental materialization has been applied to the following facts tables, which include the fact_trips, fact_payments and fact_driver_status_events. This materialization limits the amount of data that needs to be tranformed and processed for very update and during runtime. It improves warehouse query performance and reduces compute costs.
 
 ### Future Improvements
-
-
-Architecture diagram
-ERD
-Data flow explanation
-Design decisions
-Tradeoffs
-Future improvements
-
-Welcome to your new dbt project!
-
-### Using the starter project
-
-Try running the following commands:
-- dbt run
-- dbt test
-
+This project is scalable, new facts, dimensions and metrics can be added to have a robust clean analytic friendly data.
+The  driver and rider facts can be added to measure performance and loyalty  metrics. 
 
 ### Resources:
 - Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
