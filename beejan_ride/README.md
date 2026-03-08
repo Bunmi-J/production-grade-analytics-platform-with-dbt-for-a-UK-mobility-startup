@@ -54,6 +54,19 @@ Below are the business logics required to achieve BeejanRide objectives:
 It also includes a corporate_trip_flag to identify trips that were booked as corporate rides, which may have different characteristics and performance metrics compared to regular trips.
 
 ### BeejanRide Mart Layer (Dbt)
+This is the stage where dimension and fact tables are deisgned for business intelligence tools (Power BI, Tableau), Analysts and dashboards .
+#### Dimensions
+  * Dim_riders - This model creates a dimension table for riders, which includes rider_id, country, referral_code signup_date, and created_at. It serves as a reference for other models that need to join with rider information, such as trips or payments. The data is sourced from the stg_riders_raw staging table, which is expected to have been cleaned and deduplicated in the staging layer.
+    
+  * Dim_drivers - This model creates a dimension table for drivers, containing relevant information about each driver.
+  * Dim_payments - This model creates a dimension table for payments, which includes payment_id, trip_id, amount, fee, currency, payment_provider, payment_status, and created_at. It serves as a reference for other models that need to join with payment information, such as trips or riders. The data is sourced from the stg_payments_raw staging table, which has been cleaned and deduplicated in the staging layer.
+  * Dim_cities - This model creates a dimension table for cities, which includes city_id, city_name, country, and launch_date. It serves as a reference for other models that need to join with city information, such as trips or drivers. The data is sourced from the stg_cities_raw staging table, which is has been cleaned and deduplicated in the staging layer.
+  * Dim_driver_status_events - This model creates a dimension table for drivers, containing relevant information about each driver status.
+#### Fact Tables
+  * Fact_trips - This model creates the fact_trips table which contains detailed information about each trip, including trip duration, net revenue, surge pricing, and various flags for failed payments, duplicate payments, and fraud indicators. It joins the raw trips data with intermediate tables that calculate these metrics and flags.
+  * Fact_Payments - This model creates the fact_payments table which contains payment information for each trip, along with flags for failed payments, extreme surge pricing, and duplicate payments. It joins the raw payments data with the intermediate tables that flag failed payments and duplicates.
+  * Fact_driver_status_events - This model creates the fact_driver_status_events table which captures all the status events of drivers.
+    
 ### Design Decison - Source → Raw → Staging → Intermediate → Mart → →
 ### Trade-off
   * Append -dedupe
