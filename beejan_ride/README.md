@@ -1,3 +1,17 @@
+-- Production-Grade Analytics Platform with dbt
+BeejanRide, a UK mobility startup operating in five cities with prospect of scaling with next  couple of years. 
+BeejanRide provides the following services:
+Ride-hailing
+Airport transfers
+Scheduled corporate rides
+
+Architecture diagram
+ERD
+Data flow explanation
+Design decisions
+Tradeoffs
+Future improvements
+
 Welcome to your new dbt project!
 
 ### Using the starter project
