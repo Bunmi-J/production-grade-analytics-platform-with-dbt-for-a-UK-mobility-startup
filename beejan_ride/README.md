@@ -4,9 +4,16 @@ BeejanRide, a UK mobility startup operating in five cities with prospect of scal
  BeejanRide provides the following services:
    * Ride-hailing
    * Airport transfers
-   * Scheduled corporate rides
+   * Scheduled corporate rides.
+     
 Dbt provides a simplified environment for SQL/python tranformation logic in a modular approach that enhances business operations, logics and governance. It features built-in testing and data quality with native test (not_null, unique, accepted values) to ensure data integrity at every stage and detects error early. It is scalable and flexible leveraging the compute power of dataware houses like Bigquery, Redshift, Snowflake and  others.
 The real world transactional data for BeejanRide sits in a Postgres Database, to clean and tranform this database reguires data ingestion from the Progres database to BigQuery. By implememnting Airbyte, the transactional data is ingested into Bigquery.
+
+## BeejanRide Architecture Diagram
+
+![beejanride_architecture_diagram](https://github.com/user-attachments/assets/4dc2f72e-61ae-4c14-b204-df82a520a98e)
+
+
 
 ## BeejanRide Entity Relationship Diagram (ERD)
 
