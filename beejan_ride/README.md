@@ -8,6 +8,11 @@ BeejanRide, a UK mobility startup operating in five cities with prospect of scal
 Dbt provides a simplified environment for SQL/python tranformation logic in a modular approach that enhances business operations, logics and governance. It features built-in testing and data quality with native test (not_null, unique, accepted values) to ensure data integrity at every stage and detects error early. It is scalable and flexible leveraging the compute power of dataware houses like Bigquery, Redshift, Snowflake and  others.
 The real world transactional data for BeejanRide sits in a Postgres Database, to clean and tranform this database reguires data ingestion from the Progres database to BigQuery. By implememnting Airbyte, the transactional data is ingested into Bigquery.
 
+## BeejanRide Entity Relationship Diagram (ERD)
+
+<img width="332" height="390" alt="image" src="https://github.com/user-attachments/assets/9c9733a0-5e11-4610-96ef-bf0ec65c87c1" />
+
+
 ## BeejanRide End to End Data Flow
 ### Source system (Postgres database) -
 The real world transactional data that powers the BeejanRide originate and sit on this Platform. The data is raw, unprocessed and does not support analytics.The source system platform supports:
@@ -42,27 +47,12 @@ Below are the business logics required to achieve BeejanRide objectives:
 It also includes a corporate_trip_flag to identify trips that were booked as corporate rides, which may have different characteristics and performance metrics compared to regular trips.
 
 ### BeejanRide Mart Layer (Dbt)
+### Design Decison - Source → Raw → Staging → Intermediate → Mart → →
+### Trade-off
+  * Append -dedupe
+  * Incremental materialization - The implementation of incremental materialization has been applied to the facts tables which includes the fact_trips, fact_payments and fact_driver_status_events. This materialization limits the amount of data that needs to be tranformed and processed for very update and during runtime. It improves warehouse query performance and reduces compute costs.
 
-- Calculate metrics (duration, revenue, fraud scores)
-- Identify anomalies (duplicate payments, failed payments)
-- Build reusable logic (LTV, earnings, trip metrics)
-- Join staging tables to enrich data
-Purpose:
-Centralize business rules so they are consistent across all marts.
-
-align source schemma to the raw schema. 
- limits the amount of data that needs to be transformed, vastly reducing the runtime of your transformations. This improves warehouse performance and reduces compute costs.
-Process 
-Follow raw- staging-intermediate-Mart
-1- In dbt, under beejan_staging,I created staging models. The staging models perform the following
-Cast correct data types
-Deduplicate using primary keys
-Standardize timestamps
-Remove invalid or null primary keys
-Source definitions must include:
-descriptions
-freshness checks
-column tests
+### Future Improvements
 
 
 Architecture diagram
