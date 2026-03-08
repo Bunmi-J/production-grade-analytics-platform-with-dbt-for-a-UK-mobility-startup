@@ -1,6 +1,7 @@
 # Production-Grade Analytics Platform with dbt
 BeejanRide, a UK mobility startup operating in five cities with prospect of scaling within the next couple of years. Taking advantage of modern data stack tool, BeejanRide requested the services of a data engineer to implement dbt to enable production grade analytics platform to power analytics, business operations, finance and timely fraud detection.
--- BeejanRide provides the following services:
+
+BeejanRide provides the following services:
 -- Ride-hailing
 -- Airport transfers
 -- Scheduled corporate rides
