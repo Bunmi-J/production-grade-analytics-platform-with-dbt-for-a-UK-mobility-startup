@@ -79,7 +79,7 @@ Testing is to ascertain that the tranformed data adheres to business rules, logi
        * Trip duration > 0
        * Completed trip must have successful payment
   * Freshness Test - This can be configured in the source.yml file to check the freshness of the data.
-  * Snapshot - Type 2 SCD has been implemented to the drivers model to track driver_status changes, vehicle changes and rating updates. Type 2 SCD keeps both the old and new data, enhancing the ability to track historical changes like how many times a driver has changed his vehicle, whether rating has improved or poor.
+  * Snapshot - Type 2 SCD has been implemented to the drivers model to track driver_status changes, vehicle changes and rating updates. Type 2 SCD keeps both the old and new data, enhancing the ability to track historical changes like how many times a driver has changed his vehicle, whether rating has improved or not.
     
 ### Documentation and Governance
 To ensure smooth operations and maintainability, the models are tagged for operational efficiency
